@@ -4,5 +4,5 @@
 public interface IProcessor {
     void execute();
 
-    void processTerm();
+    void writeFile();
 }

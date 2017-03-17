@@ -12,18 +12,21 @@ public class ApplicationRunner {
     private static HashSet<String> stopWords;
     private static IProcessor iProcessor;
 
-    public ApplicationRunner() {
-        lemmaDictionary = new TreeMap<>();
-        stemmingDictionary = new TreeMap<>();
-        lemmaDocumentMap = new HashMap<>();
-        stemmingDocumentMap = new HashMap<>();
-        stopWords = new HashSet<>();
+    public ApplicationRunner(){
+
     }
+
+
 
     public static void main(String[] args) {
         if (args.length != 2)
             System.out.println("Please provide valid dataset path and stop words path");
         else {
+            lemmaDictionary = new TreeMap<>();
+            stemmingDictionary = new TreeMap<>();
+            lemmaDocumentMap = new HashMap<>();
+            stemmingDocumentMap = new HashMap<>();
+            stopWords = new HashSet<>();
             // load stop words
             loadStopwords(args[1]);
             processFile(args[0]);
@@ -65,12 +68,31 @@ public class ApplicationRunner {
         else {
             iProcessor = new UncompressedLemmaProcessor(lstFiles);
             iProcessor.execute();
-
+            iProcessor.writeFile();
 
             iProcessor = new UncompressedStemProcessor(lstFiles);
             iProcessor.execute();
+            iProcessor.writeFile();
         }
     }
 
+    public static SortedMap<String, LinkedList<PostingNode>> getLemmaDictionary() {
+        return lemmaDictionary;
+    }
 
+    public static SortedMap<String, LinkedList<PostingNode>> getStemmingDictionary() {
+        return stemmingDictionary;
+    }
+
+    public static HashMap<Integer, DocumentNode> getLemmaDocumentMap() {
+        return lemmaDocumentMap;
+    }
+
+    public static HashMap<Integer, DocumentNode> getStemmingDocumentMap() {
+        return stemmingDocumentMap;
+    }
+
+    public static HashSet<String> getStopWords() {
+        return stopWords;
+    }
 }

@@ -90,4 +90,29 @@ public class Utility {
 
         return tokenizedWords;
     }
+
+    public static void serializeObject(String indexFileName, Object dictionary, Object documentMap) {
+        File file = new File(indexFileName);
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(dictionary);
+            objectOutputStream.writeObject(documentMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                objectOutputStream.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+    }
 }
