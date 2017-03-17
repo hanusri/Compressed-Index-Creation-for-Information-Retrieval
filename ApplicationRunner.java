@@ -1,29 +1,58 @@
-import java.io.File;
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 
 /**
  * Created by Srikanth on 1/31/2017.
  */
 public class ApplicationRunner {
-    private SortedMap<String, PostingNode> lemmaDictionary;
-    private SortedMap<String, PostingNode> stemmingDictionary;
-    private HashMap<Integer, DocumentNode> lemmaDocumentMap;
-    private HashMap<Integer, DocumentNode> stemmingDocumentMap;
+    private static SortedMap<String, LinkedList<PostingNode>> lemmaDictionary;
+    private static SortedMap<String, LinkedList<PostingNode>> stemmingDictionary;
+    private static HashMap<Integer, DocumentNode> lemmaDocumentMap;
+    private static HashMap<Integer, DocumentNode> stemmingDocumentMap;
+    private static HashSet<String> stopWords;
+    private static IProcessor iProcessor;
 
     public ApplicationRunner() {
         lemmaDictionary = new TreeMap<>();
         stemmingDictionary = new TreeMap<>();
         lemmaDocumentMap = new HashMap<>();
         stemmingDocumentMap = new HashMap<>();
+        stopWords = new HashSet<>();
     }
 
     public static void main(String[] args) {
-        if (args.length != 1)
-            System.out.println("Please provide valid dataset path");
+        if (args.length != 2)
+            System.out.println("Please provide valid dataset path and stop words path");
         else {
+            // load stop words
+            loadStopwords(args[1]);
             processFile(args[0]);
+        }
+    }
+
+    private static void loadStopwords(String stopwordsPath) {
+        FileInputStream fileInputStream = null;
+        DataInputStream dataInputStream = null;
+        BufferedReader bufferedReader = null;
+        try {
+            File stopwordsFile = new File(stopwordsPath);
+            fileInputStream = new FileInputStream(stopwordsFile);
+            dataInputStream = new DataInputStream(fileInputStream);
+            bufferedReader = new BufferedReader(new InputStreamReader(dataInputStream));
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                stopWords.add(line.toLowerCase());
+            }
+        } catch (Exception e) {
+            try {
+                fileInputStream.close();
+                dataInputStream.close();
+                bufferedReader.close();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         }
     }
 
@@ -34,14 +63,14 @@ public class ApplicationRunner {
         if (lstFiles.length == 0)
             System.out.println("Error loading the directory");
         else {
-            System.out.println("Tokenization Analysis of Documents");
-            System.out.println("----------------------------------");
-            TokenSummary tokenSummary = new TokenSummary();
-            DatasetProcessor datasetProcessor = new DatasetProcessor(tokenSummary, lstFiles);
-            System.out.println("Stemming Analysis of Documents");
-            System.out.println("------------------------------");
-            StemmingExecutor stemmingExecutor = new StemmingExecutor(tokenSummary);
-            stemmingExecutor.processStemming();
+            iProcessor = new UncompressedLemmaProcessor(lstFiles);
+            iProcessor.execute();
+
+
+            iProcessor = new UncompressedStemProcessor(lstFiles);
+            iProcessor.execute();
         }
     }
+
+
 }

@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -37,5 +34,60 @@ public class Utility {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;
+    }
+
+    public static ArrayList<String> processFiles(File file) {
+        FileInputStream fis = null;
+        DataInputStream dis = null;
+        BufferedReader bufferedReader = null;
+        ArrayList<String> tokenizedWords = new ArrayList<>();
+        try {
+
+            if (file.isFile()) {
+                // increase the document count
+                fis = new FileInputStream(file);
+                dis = new DataInputStream(fis);
+                bufferedReader = new BufferedReader(new InputStreamReader(dis));
+
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    StringTokenizer tokenizer = new StringTokenizer(line, Constants.TOKENIZER_SPLIT);
+                    while (tokenizer.hasMoreTokens()) {
+
+                        String word = tokenizer.nextToken().trim().toLowerCase();
+                        // remove words which are xml tags
+                        if (word.matches("<[^>]+>") || word.matches("<\\/[^>]+>"))
+                            continue;
+
+
+                        // split the word if it has - or _ or white spaces like tab or \n
+                        String[] subWords = word.split("\\s+|\\-|\\_|\\(|\\)|\\,|\\\\|\\/");
+
+                        for (String subWord : subWords) {
+
+                            if (subWord.trim().isEmpty())
+                                continue;
+
+                            // remove workds which are just numbers or just symbols
+                            if (subWord.matches("(\\d)*") || subWord.matches("(\\d)*.") || subWord.matches("(\\d)*.(\\d)*") ||
+                                    subWord.matches("[^\\w\\s]+"))
+                                continue;
+
+                            // handle the 's by spliting the part and taking the actual work
+                            if (subWord.matches("(.*)\\'s"))
+                                subWord = subWord.replace("'s", "");
+
+                            //tokenSummary.addToDictionary(subWord);
+                            tokenizedWords.add(subWord);
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println(ex.getCause());
+        }
+
+        return tokenizedWords;
     }
 }
