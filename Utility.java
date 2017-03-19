@@ -14,7 +14,6 @@ public class Utility {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-
         return new File[0];
     }
 
@@ -135,28 +134,24 @@ public class Utility {
         }
     }
 
-    public static String gammaEncode(int num) {
+    private static String gammaEncode(int num) {
         if(num == 0) {
             return  "0";
         }
-
         String binary = numToBinary(num);
         String offset = binary.substring(1);
         int offsetSize = offset.length();
         String offsetUnaryCode = getUnaryCode(offsetSize);
-
         String gammaCode = offsetUnaryCode + offset;
-
         return gammaCode;
     }
 
-    public static String deltaEncode(int num) {
+    private static String deltaEncode(int num) {
         String binary = numToBinary(num);
         String offset = binary.substring(1);
         int binaryLen = binary.length();
         String gammaEncodedString = gammaEncode(binaryLen);
         String deltaEncodedString = gammaEncodedString + offset;
-
         return deltaEncodedString;
     }
 
@@ -169,20 +164,17 @@ public class Utility {
             s = num % 2 + s;
             num /= 2;
         }
-
         return s;
     }
 
     public static int binaryToNum(String s) {
         int num = 0;
-
         for(int i = s.length() - 1; i >= 0; i--) {
             char ch = s.charAt(i);
             if(ch == '1') {
                 num += (int) Math.pow(2, i);
             }
         }
-
         return num;
     }
 
@@ -193,7 +185,25 @@ public class Utility {
             s += "1";
         }
         s += "0";
-
         return s;
+    }
+
+    public static byte[] gammaEncode(LinkedList<PostingNode> postingNodes) {
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
+        int gap;
+        int previousDocId = 0;
+        for (int i = 0; i < postingNodes.size(); i++) {
+            int currentDocId = postingNodes.get(i).getDocumentId();
+            if (i == 0) {
+                gap = currentDocId;
+            } else {
+                gap = currentDocId - previousDocId;
+            }
+            previousDocId = currentDocId;
+            EliasEncode(gap, bitOutputStream, true);
+        }
+        bitOutputStream.close();
+        return byteOutput.toByteArray();
     }
 }

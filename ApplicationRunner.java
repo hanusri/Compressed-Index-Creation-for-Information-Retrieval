@@ -17,7 +17,6 @@ public class ApplicationRunner {
 
     }
 
-
     public static void main(String[] args) {
         if (args.length != 2)
             System.out.println("Please provide valid dataset path and stop words path");

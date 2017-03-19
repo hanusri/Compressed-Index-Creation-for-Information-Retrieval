@@ -11,7 +11,6 @@ import java.util.Map;
  */
 public class CompressedLemmaProcessor implements IProcessor {
 
-
     @Override
     public void execute() {
 
@@ -33,7 +32,7 @@ public class CompressedLemmaProcessor implements IProcessor {
                 block.setTermPointer(termPointer);
             }
             block.setDocFrequency(currentTermInBlock, invertedIndexValueEntry.size());
-            block.getPostingPointers().add(gammaEncode(invertedIndexValueEntry));
+            block.getPostingPointers().add(Utility.gammaEncode(invertedIndexValueEntry));
             termCount++;
         }
 
@@ -41,25 +40,6 @@ public class CompressedLemmaProcessor implements IProcessor {
             ApplicationRunner.getBlockCollection().getBlocks().add(block);
 
         ApplicationRunner.getBlockCollection().setTerm(termConstructor.toString());
-    }
-
-    public byte[] gammaEncode(LinkedList<PostingNode> postingNodes) {
-        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
-        int gap;
-        int previousDocId = 0;
-        for (int i = 0; i < postingNodes.size(); i++) {
-            int currentDocId = postingNodes.get(i).getDocumentId();
-            if (i == 0) {
-                gap = currentDocId;
-            } else {
-                gap = currentDocId - previousDocId;
-            }
-            previousDocId = currentDocId;
-            Utility.EliasEncode(gap, bitOutputStream, true);
-        }
-        bitOutputStream.close();
-        return byteOutput.toByteArray();
     }
 
     @Override
