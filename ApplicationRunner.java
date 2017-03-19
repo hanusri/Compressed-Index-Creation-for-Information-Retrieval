@@ -9,13 +9,13 @@ public class ApplicationRunner {
     private static SortedMap<String, LinkedList<PostingNode>> stemmingDictionary;
     private static HashMap<Integer, DocumentNode> lemmaDocumentMap;
     private static HashMap<Integer, DocumentNode> stemmingDocumentMap;
+    private static BlockCollection blockCollection;
     private static HashSet<String> stopWords;
     private static IProcessor iProcessor;
 
-    public ApplicationRunner(){
+    public ApplicationRunner() {
 
     }
-
 
 
     public static void main(String[] args) {
@@ -27,6 +27,7 @@ public class ApplicationRunner {
             lemmaDocumentMap = new HashMap<>();
             stemmingDocumentMap = new HashMap<>();
             stopWords = new HashSet<>();
+            blockCollection = new BlockCollection();
             // load stop words
             loadStopwords(args[1]);
             processFile(args[0]);

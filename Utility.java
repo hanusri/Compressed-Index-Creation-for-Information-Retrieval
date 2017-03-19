@@ -69,9 +69,9 @@ public class Utility {
                                 continue;
 
                             // remove workds which are just numbers or just symbols
-                            if (subWord.matches("(\\d)*") || subWord.matches("(\\d)*.") || subWord.matches("(\\d)*.(\\d)*") ||
+                           /* if (subWord.matches("(\\d)*") || subWord.matches("(\\d)*.") || subWord.matches("(\\d)*.(\\d)*") ||
                                     subWord.matches("[^\\w\\s]+"))
-                                continue;
+                                continue;*/
 
                             // handle the 's by spliting the part and taking the actual work
                             if (subWord.matches("(.*)\\'s"))

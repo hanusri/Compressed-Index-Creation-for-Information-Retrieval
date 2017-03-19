@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Srikanth on 3/16/2017.
@@ -23,11 +24,15 @@ public class UncompressedLemmaProcessor implements IProcessor {
             documentNode.setDocumentLength(tokenizedWords.size());
             int maxTermFreq = 0;
             String maxTerm = "";
+            Lemmatizer lemmatizer = new Lemmatizer();
             for (String word : tokenizedWords) {
                 // Ignore stop words
                 if (!ApplicationRunner.getStopWords().contains(word)) {
                     // lemmatize
-
+                    List<String> lemmatizedWords = lemmatizer.lemmatize(word);
+                    if(lemmatizedWords == null || lemmatizedWords.size() == 0)
+                        continue;
+                    word = lemmatizedWords.get(0);
                     // add postingnode to invertedmap
                     LinkedList<PostingNode> postingNodes = ApplicationRunner.getLemmaDictionary().get(word);
                     if (postingNodes == null || docId != postingNodes.get(postingNodes.size() - 1).getDocumentId()) {
@@ -62,5 +67,10 @@ public class UncompressedLemmaProcessor implements IProcessor {
     public void writeFile() {
         Utility.serializeObject(Constants.UNCOMPRESSED_INDEX_VERSION1_FILENAME, ApplicationRunner.getLemmaDictionary(),
                 ApplicationRunner.getLemmaDocumentMap());
+    }
+
+    @Override
+    public void printDitionary() {
+
     }
 }

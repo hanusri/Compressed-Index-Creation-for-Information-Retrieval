@@ -5,4 +5,6 @@ public interface IProcessor {
     void execute();
 
     void writeFile();
+
+    void printDitionary();
 }

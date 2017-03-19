@@ -23,20 +23,22 @@ public class UncompressedStemProcessor implements IProcessor {
             documentNode.setDocumentLength(tokenizedWords.size());
             int maxTermFreq = 0;
             String maxTerm = "";
+            Stemmer stemmer;
             for (String word : tokenizedWords) {
                 // Ignore stop words
                 if (!ApplicationRunner.getStopWords().contains(word)) {
                     // perform stemming
-
+                    stemmer = new Stemmer();
+                    stemmer.add(word.toCharArray(), word.length());
+                    stemmer.stem();
+                    word = stemmer.toString();
                     // add postingnode to invertedmap
                     LinkedList<PostingNode> postingNodes = ApplicationRunner.getStemmingDictionary().get(word);
                     if (postingNodes == null || docId != postingNodes.get(postingNodes.size() - 1).getDocumentId()) {
                         PostingNode postingNode = new PostingNode(docId);
                         postingNode.setTermFrequency(1);
-
                         if (postingNodes == null)
                             postingNodes = new LinkedList<>();
-
                         postingNodes.add(postingNode);
                     } else {
                         PostingNode postingNode = postingNodes.get(postingNodes.size() - 1);
@@ -49,7 +51,6 @@ public class UncompressedStemProcessor implements IProcessor {
                         postingNode.setTermFrequency(currenttermFreq);
                     }
                     ApplicationRunner.getStemmingDictionary().put(word, postingNodes);
-
                 }
             }
             documentNode.setMaxFrequentTerm(maxTerm);
@@ -62,5 +63,10 @@ public class UncompressedStemProcessor implements IProcessor {
     public void writeFile() {
         Utility.serializeObject(Constants.UNCOMPRESSED_INDEX_VERSION2_FILENAME, ApplicationRunner.getStemmingDictionary(),
                 ApplicationRunner.getStemmingDocumentMap());
+    }
+
+    @Override
+    public void printDitionary() {
+
     }
 }
