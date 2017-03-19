@@ -1,13 +1,20 @@
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Srikanth on 3/18/2017.
  */
 public class Block implements Serializable {
     private int termPointer;
-    private byte[] encodeBytes;
+    private List<byte[]> postingPointers;
     //TODO: Need to change doc frequency of all terms in the block to byte array
-    private int[] docFrequency;
+    private int[] docFrequencies;
+
+    public Block() {
+        postingPointers = new ArrayList<>();
+        docFrequencies = new int[Constants.BLOCK_SIZE];
+    }
 
     public int getTermPointer() {
         return termPointer;
@@ -17,19 +24,23 @@ public class Block implements Serializable {
         this.termPointer = termPointer;
     }
 
-    public byte[] getEncodeBytes() {
-        return encodeBytes;
+    public List<byte[]> getPostingPointers() {
+        return postingPointers;
     }
 
-    public void setEncodeBytes(byte[] encodeBytes) {
-        this.encodeBytes = encodeBytes;
+    public void setPostingPointers(List<byte[]> postingPointers) {
+        this.postingPointers = postingPointers;
     }
 
-    public int[] getDocFrequency() {
-        return docFrequency;
+    public int[] getDocFrequencies() {
+        return docFrequencies;
     }
 
-    public void setDocFrequency(int[] docFrequency) {
-        this.docFrequency = docFrequency;
+    public void setDocFrequencies(int[] docFrequencies) {
+        this.docFrequencies = docFrequencies;
+    }
+
+    public void setDocFrequency(int index, int docFrequency) {
+        this.docFrequencies[index] = docFrequency;
     }
 }

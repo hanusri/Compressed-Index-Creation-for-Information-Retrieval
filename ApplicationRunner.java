@@ -74,6 +74,10 @@ public class ApplicationRunner {
             iProcessor = new UncompressedStemProcessor(lstFiles);
             iProcessor.execute();
             iProcessor.writeFile();
+
+            iProcessor = new CompressedLemmaProcessor();
+            iProcessor.execute();
+            iProcessor.writeFile();
         }
     }
 
@@ -95,5 +99,9 @@ public class ApplicationRunner {
 
     public static HashSet<String> getStopWords() {
         return stopWords;
+    }
+
+    public static BlockCollection getBlockCollection() {
+        return blockCollection;
     }
 }
