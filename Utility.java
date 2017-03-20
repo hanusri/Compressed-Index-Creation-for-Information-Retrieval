@@ -118,25 +118,24 @@ public class Utility {
     public static void EliasEncode(int gap, BitOutputStream output, boolean isGamma) {
 
         String encodedString;
-        if(isGamma) {
+        if (isGamma) {
             encodedString = gammaEncode(gap);
         } else {
             encodedString = deltaEncode(gap);
         }
 
-        for(int i = encodedString.length() - 1; i >= 0; i--) {
-            if(encodedString.charAt(i) == '0') {
+        for (int i = encodedString.length() - 1; i >= 0; i--) {
+            if (encodedString.charAt(i) == '0') {
                 output.writeBit(0);
-            }
-            else if(encodedString.charAt(i) == '1') {
+            } else if (encodedString.charAt(i) == '1') {
                 output.writeBit(1);
             }
         }
     }
 
     private static String gammaEncode(int num) {
-        if(num == 0) {
-            return  "0";
+        if (num == 0) {
+            return "0";
         }
         String binary = numToBinary(num);
         String offset = binary.substring(1);
@@ -156,11 +155,11 @@ public class Utility {
     }
 
     public static String numToBinary(int num) {
-        if(num == 0)
+        if (num == 0)
             return "0";
 
         String s = "";
-        while(num > 0) {
+        while (num > 0) {
             s = num % 2 + s;
             num /= 2;
         }
@@ -169,9 +168,9 @@ public class Utility {
 
     public static int binaryToNum(String s) {
         int num = 0;
-        for(int i = s.length() - 1; i >= 0; i--) {
+        for (int i = s.length() - 1; i >= 0; i--) {
             char ch = s.charAt(i);
-            if(ch == '1') {
+            if (ch == '1') {
                 num += (int) Math.pow(2, i);
             }
         }
@@ -181,14 +180,14 @@ public class Utility {
 
     public static String getUnaryCode(int count) {
         String s = "";
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             s += "1";
         }
         s += "0";
         return s;
     }
 
-    public static byte[] gammaEncode(LinkedList<PostingNode> postingNodes) {
+    public static byte[] encode(LinkedList<PostingNode> postingNodes, boolean isGamma) {
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
         int gap;
@@ -201,8 +200,27 @@ public class Utility {
                 gap = currentDocId - previousDocId;
             }
             previousDocId = currentDocId;
-            EliasEncode(gap, bitOutputStream, true);
+            EliasEncode(gap, bitOutputStream, isGamma);
         }
+        bitOutputStream.close();
+        return byteOutput.toByteArray();
+    }
+
+    public static byte[] encode(List<Integer> list,boolean isGamma) {
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
+
+        for (int i = 0; i < list.size(); i++) {
+            EliasEncode(list.get(i), bitOutputStream, isGamma);
+        }
+        bitOutputStream.close();
+        return byteOutput.toByteArray();
+    }
+
+    public static byte[] encode(int value,boolean isGamma) {
+        ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+        BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
+        EliasEncode(value, bitOutputStream, isGamma);
         bitOutputStream.close();
         return byteOutput.toByteArray();
     }

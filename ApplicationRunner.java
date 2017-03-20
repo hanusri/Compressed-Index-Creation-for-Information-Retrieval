@@ -9,7 +9,10 @@ public class ApplicationRunner {
     private static SortedMap<String, LinkedList<PostingNode>> stemmingDictionary;
     private static HashMap<Integer, DocumentNode> lemmaDocumentMap;
     private static HashMap<Integer, DocumentNode> stemmingDocumentMap;
-    private static BlockCollection blockCollection;
+    private static HashMap<Integer, CompressedDocumentNode> lemmaCompressedDocumentMap;
+    private static HashMap<Integer, CompressedDocumentNode> stemmingCompressedDocumentMap;
+    private static BlockCollection lemmaBlockCollection;
+    private static BlockCollection stemmingBlockCollection;
     private static HashSet<String> stopWords;
     private static IProcessor iProcessor;
 
@@ -25,8 +28,11 @@ public class ApplicationRunner {
             stemmingDictionary = new TreeMap<>();
             lemmaDocumentMap = new HashMap<>();
             stemmingDocumentMap = new HashMap<>();
+            lemmaCompressedDocumentMap = new HashMap<>();
+            stemmingCompressedDocumentMap = new HashMap<>();
             stopWords = new HashSet<>();
-            blockCollection = new BlockCollection();
+            lemmaBlockCollection = new BlockCollection();
+            stemmingBlockCollection = new BlockCollection();
             // load stop words
             loadStopwords(args[1]);
             processFile(args[0]);
@@ -77,6 +83,10 @@ public class ApplicationRunner {
             iProcessor = new CompressedLemmaProcessor();
             iProcessor.execute();
             iProcessor.writeFile();
+
+            iProcessor = new CompressedStemProcessor();
+            iProcessor.execute();
+            iProcessor.writeFile();
         }
     }
 
@@ -100,7 +110,19 @@ public class ApplicationRunner {
         return stopWords;
     }
 
-    public static BlockCollection getBlockCollection() {
-        return blockCollection;
+    public static BlockCollection getLemmaBlockCollection() {
+        return lemmaBlockCollection;
+    }
+
+    public static HashMap<Integer, CompressedDocumentNode> getLemmaCompressedDocumentMap() {
+        return lemmaCompressedDocumentMap;
+    }
+
+    public static HashMap<Integer, CompressedDocumentNode> getStemmingCompressedDocumentMap() {
+        return stemmingCompressedDocumentMap;
+    }
+
+    public static BlockCollection getStemmingBlockCollection() {
+        return stemmingBlockCollection;
     }
 }
