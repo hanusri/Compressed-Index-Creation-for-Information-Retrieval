@@ -16,6 +16,8 @@ public class ApplicationRunner {
     private static BlockCollection lemmaBlockCollection;
     private static BlockCollection stemmingBlockCollection;
     private static HashSet<String> stopWords;
+    private static HashMap<String, TermStatisticsEntry> lemmaCompressedStatistics;
+    private static HashMap<String, TermStatisticsEntry> stemCompressedStatistics;
     private static IProcessor iProcessor;
 
     public ApplicationRunner() {
@@ -35,10 +37,33 @@ public class ApplicationRunner {
             stopWords = new HashSet<>();
             lemmaBlockCollection = new BlockCollection();
             stemmingBlockCollection = new BlockCollection();
+            lemmaCompressedStatistics = new HashMap<>();
+            stemCompressedStatistics = new HashMap<>();
             // load stop words
             loadStopwords(args[1]);
+            loadLemmaStemStatisticalMap();
             processFile(args[0]);
         }
+    }
+
+    private static void loadLemmaStemStatisticalMap() {
+        Lemmatizer lemmatizer = new Lemmatizer();
+        String[] terms = {"Reynolds", "NASA", "Prandtl", "flow", "pressure", "boundary", "shock"};
+        // convert the terms to its lemmas
+        Stemmer stemmer;
+        for (int i = 0; i < terms.length; i++) {
+            String term = terms[i].toLowerCase();
+            String lemmaTerm = lemmatizer.lemmatize(term).get(0);
+            lemmaCompressedStatistics.put(lemmaTerm, null);
+
+            stemmer = new Stemmer();
+            stemmer.add(term.toCharArray(), term.length());
+            stemmer.stem();
+            String stemTerm = stemmer.toString();
+            stemCompressedStatistics.put(stemTerm, null);
+        }
+
+
     }
 
     private static void loadStopwords(String stopwordsPath) {
@@ -120,6 +145,109 @@ public class ApplicationRunner {
         System.out.println("Index size of Version 1 compressed (in bytes):  " + new File(Constants.COMPRESSED_INDEX_VERSION1_FILENAME).length());
         System.out.println("Index size of Version 2 uncompressed (in bytes):  " + new File(Constants.UNCOMPRESSED_INDEX_VERSION2_FILENAME).length());
         System.out.println("Index size of Version 2 compressed (in bytes):  " + new File(Constants.COMPRESSED_INDEX_VERSION2_FILENAME).length());
+
+        System.out.println("*******Inverted List Count***********");
+        System.out.println("Number of inverted Lists in index V1(Both Compressed and Uncompressed): " + ApplicationRunner.getLemmaDictionary().size());
+        System.out.println("Number of inverted Lists in index V2(Both Compressed and Uncompressed): " + ApplicationRunner.getStemmingDictionary().size());
+
+
+        System.out.println("*******Analysis of Following Terms***********");
+        printLemmaIndexInformation();
+        printStemIndexInformation();
+
+        System.out.println("*******More Information about term NASA***********");
+        // print details related to Lemma
+        List<PostingNode> lemmaPostingNodes = lemmaDictionary.get("nasa");
+        System.out.println("Version 1 details");
+        System.out.println("-----------------");
+        System.out.println(String.format("\n\t %-10s \t %-10s \t %-10s \t %10s", "Doc ID", "Term Freq", "Doc Length", "Max Term Frequency"));
+        for (int i = 0; i < 3; i++) {
+            PostingNode postingNode = lemmaPostingNodes.get(i);
+            int docId = postingNode.getDocumentId();
+            int termFrequency = postingNode.getTermFrequency();
+            DocumentNode documentNode = lemmaDocumentMap.get(docId);
+            int documentLength = documentNode.getDocumentLength();
+            int maxFrequency = documentNode.getMaxTermFrequency();
+            System.out.println(String.format("\t %-10d \t %-10d \t %-10d \t %10d",
+                    docId,
+                    termFrequency,
+                    documentLength,
+                    maxFrequency));
+        }
+        // print details related to Stem
+        List<PostingNode> stemmingPostingNodes = stemmingDictionary.get("nasa");
+        System.out.println("Version 2 details");
+        System.out.println("-----------------");
+        System.out.println(String.format("\n\t %-10s \t %-10s \t %-10s \t %10s", "Doc ID", "Term Freq", "Doc Length", "Max Term Frequency"));
+        for (int i = 0; i < 3; i++) {
+            PostingNode postingNode = stemmingPostingNodes.get(i);
+            int docId = postingNode.getDocumentId();
+            int termFrequency = postingNode.getTermFrequency();
+            DocumentNode documentNode = stemmingDocumentMap.get(docId);
+            int documentLength = documentNode.getDocumentLength();
+            int maxFrequency = documentNode.getMaxTermFrequency();
+            System.out.println(String.format("\t %-10d \t %-10d \t %-10d \t %10d",
+                    docId,
+                    termFrequency,
+                    documentLength,
+                    maxFrequency));
+        }
+    }
+
+    private static void printLemmaIndexInformation() {
+        System.out.println("Verion 1 Analysis");
+        System.out.println("-----------------");
+        System.out.println(String.format("\n %-15s \t %-10s  %-10s %-10s %-10s ", "Type", "Lemma", "Doc Frequency", "Total Term Frequency", "Inverted list in bytes"));
+
+        for (String lemmaTerm : lemmaCompressedStatistics.keySet()) {
+            List<PostingNode> lemmaPostingNodes = ApplicationRunner.getLemmaDictionary().get(lemmaTerm);
+            int totalTermFrequency = 0;
+
+            for (PostingNode node : lemmaPostingNodes)
+                totalTermFrequency += node.getTermFrequency();
+
+            System.out.println(String.format(" %15s \t %-10s  \t %-10d \t %-10d \t %-10d",
+                    "Uncompressed",
+                    lemmaTerm,
+                    lemmaPostingNodes.size(),
+                    totalTermFrequency,
+                    Utility.getUncompressedPostingListSize(lemmaPostingNodes, lemmaTerm.length())));
+
+            System.out.println(String.format(" %15s \t %-10s  \t %-10d \t %-10d \t %-10d",
+                    "Compressed",
+                    lemmaTerm,
+                    lemmaPostingNodes.size(),
+                    totalTermFrequency,
+                    Utility.getCompressedPostingListSize(getLemmaCompressedStatistics().get(lemmaTerm), lemmaTerm.length())));
+        }
+    }
+
+    private static void printStemIndexInformation() {
+        System.out.println("Verion 2 Analysis");
+        System.out.println("-----------------");
+        System.out.println(String.format("\n %-15s %-10s  %-10s %-10s %-10s ", "Type", "Stem", "Doc Frequency", "Total Term Frequency", "Inverted list in bytes"));
+
+        for (String stemTerm : stemCompressedStatistics.keySet()) {
+            List<PostingNode> stemPostingNodes = ApplicationRunner.getStemmingDictionary().get(stemTerm);
+            int totalTermFrequency = 0;
+
+            for (PostingNode node : stemPostingNodes)
+                totalTermFrequency += node.getTermFrequency();
+
+            System.out.println(String.format(" %15s %-10s  \t %-10d \t %-10d \t %-10d",
+                    "Uncompressed",
+                    stemTerm,
+                    stemPostingNodes.size(),
+                    totalTermFrequency,
+                    Utility.getUncompressedPostingListSize(stemPostingNodes, stemTerm.length())));
+
+            System.out.println(String.format(" %15s %-10s  \t %-10d \t %-10d \t %-10d",
+                    "Compressed",
+                    stemTerm,
+                    stemPostingNodes.size(),
+                    totalTermFrequency,
+                    Utility.getCompressedPostingListSize(getStemCompressedStatistics().get(stemTerm), stemTerm.length())));
+        }
     }
 
     public static SortedMap<String, LinkedList<PostingNode>> getLemmaDictionary() {
@@ -156,5 +284,21 @@ public class ApplicationRunner {
 
     public static BlockCollection getStemmingBlockCollection() {
         return stemmingBlockCollection;
+    }
+
+    public static HashMap<String, TermStatisticsEntry> getLemmaCompressedStatistics() {
+        return lemmaCompressedStatistics;
+    }
+
+    public static void setLemmaCompressedStatistics(HashMap<String, TermStatisticsEntry> lemmaCompressedStatistics) {
+        ApplicationRunner.lemmaCompressedStatistics = lemmaCompressedStatistics;
+    }
+
+    public static HashMap<String, TermStatisticsEntry> getStemCompressedStatistics() {
+        return stemCompressedStatistics;
+    }
+
+    public static void setStemCompressedStatistics(HashMap<String, TermStatisticsEntry> stemCompressedStatistics) {
+        ApplicationRunner.stemCompressedStatistics = stemCompressedStatistics;
     }
 }

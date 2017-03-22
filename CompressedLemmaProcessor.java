@@ -29,14 +29,21 @@ public class CompressedLemmaProcessor implements IProcessor {
                 block.setTermPointer(termPointer);
             }
             block.setDocFrequency(currentTermInBlock, postingLists.size());
-            block.getPostingPointers().add(Utility.encode(postingLists, true));
+            byte[] postingList = Utility.encode(postingLists, true);
+            block.getPostingPointers().add(postingList);
             List<Integer> termFreqs = new ArrayList<>();
             // set term frequencies
             for (int i = 0; i < postingLists.size(); i++) {
                 termFreqs.add(postingLists.get(i).getTermFrequency());
             }
-            block.getTermFrequencies().add(Utility.encode(termFreqs, true));
+            byte[] termFrequency = Utility.encode(termFreqs, true);
+            block.getTermFrequencies().add(termFrequency);
             termCount++;
+
+            if (ApplicationRunner.getLemmaCompressedStatistics().containsKey(term)) {
+                TermStatisticsEntry termStatisticsEntry = new TermStatisticsEntry(postingList, termFrequency);
+                ApplicationRunner.getLemmaCompressedStatistics().put(term, termStatisticsEntry);
+            }
         }
 
         if (block.getPostingPointers().size() != 0)

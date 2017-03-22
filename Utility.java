@@ -206,7 +206,7 @@ public class Utility {
         return byteOutput.toByteArray();
     }
 
-    public static byte[] encode(List<Integer> list,boolean isGamma) {
+    public static byte[] encode(List<Integer> list, boolean isGamma) {
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
 
@@ -217,11 +217,24 @@ public class Utility {
         return byteOutput.toByteArray();
     }
 
-    public static byte[] encode(int value,boolean isGamma) {
+    public static byte[] encode(int value, boolean isGamma) {
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         BitOutputStream bitOutputStream = new BitOutputStream(byteOutput);
         EliasEncode(value, bitOutputStream, isGamma);
         bitOutputStream.close();
         return byteOutput.toByteArray();
+    }
+
+    public static int getUncompressedPostingListSize(List<PostingNode> postingNodes, int termLength) {
+        int size = 8 + 8 + termLength;
+        size += postingNodes.size() * 8;
+        return size;
+    }
+
+    public static int getCompressedPostingListSize(TermStatisticsEntry termStatisticsEntry, int termLength) {
+        int size = 8 + 8 + termLength;
+        size += termStatisticsEntry.getPostingList().length;
+        size += termStatisticsEntry.getTermFrequencies().length;
+        return size;
     }
 }

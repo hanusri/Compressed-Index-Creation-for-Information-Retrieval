@@ -34,14 +34,23 @@ public class CompressedStemProcessor implements IProcessor {
                 block = new Block();
             }
             block.setDocFrequency(currentTermInBlock, postingLists.size());
-            block.getPostingPointers().add(Utility.encode(postingLists, false));
+            byte[] postingList = Utility.encode(postingLists, false);
+            block.getPostingPointers().add(postingList);
+
             List<Integer> termFreqs = new ArrayList<>();
             // set term frequencies
             for (int i = 0; i < postingLists.size(); i++) {
                 termFreqs.add(postingLists.get(i).getTermFrequency());
             }
-            block.getTermFrequencies().add(Utility.encode(termFreqs, false));
+
+            byte[] termFrequency = Utility.encode(termFreqs, false);
+            block.getTermFrequencies().add(termFrequency);
             termCount++;
+
+            if (ApplicationRunner.getStemCompressedStatistics().containsKey(term)) {
+                TermStatisticsEntry termStatisticsEntry = new TermStatisticsEntry(postingList, termFrequency);
+                ApplicationRunner.getStemCompressedStatistics().put(term, termStatisticsEntry);
+            }
         }
 
         if (block.getPostingPointers().size() != 0) {

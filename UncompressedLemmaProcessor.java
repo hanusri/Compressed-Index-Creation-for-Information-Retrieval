@@ -30,7 +30,7 @@ public class UncompressedLemmaProcessor implements IProcessor {
                 if (!ApplicationRunner.getStopWords().contains(word)) {
                     // lemmatize
                     List<String> lemmatizedWords = lemmatizer.lemmatize(word);
-                    if(lemmatizedWords == null || lemmatizedWords.size() == 0)
+                    if (lemmatizedWords == null || lemmatizedWords.size() == 0)
                         continue;
                     word = lemmatizedWords.get(0);
                     // add postingnode to invertedmap
@@ -54,7 +54,6 @@ public class UncompressedLemmaProcessor implements IProcessor {
                         postingNode.setTermFrequency(currenttermFreq);
                     }
                     ApplicationRunner.getLemmaDictionary().put(word, postingNodes);
-
                 }
             }
             documentNode.setMaxFrequentTerm(maxTerm);
