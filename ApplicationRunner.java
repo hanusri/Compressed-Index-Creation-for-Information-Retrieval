@@ -156,6 +156,126 @@ public class ApplicationRunner {
         printStemIndexInformation();
 
         System.out.println("*******More Information about term NASA***********");
+        printNASAInformation();
+
+        System.out.println("*******Print Maximum and Minimum Document Frequency Terms***********");
+        printLemmaMaxMinDocFrequencyInformation();
+        printStemMaxMinDocFrequencyInformation();
+
+        System.out.println("*******Print Document Statistics***********");
+        printDocumentMapInformation();
+    }
+
+    private static void printDocumentMapInformation() {
+        int maxDocLen = Integer.MIN_VALUE;
+        int maxDocLenID = -1;
+        int maxMaxFrequencyID = -1;
+        int maxMaxFrequency = Integer.MIN_VALUE;
+
+        for (Map.Entry<Integer, DocumentNode> document : lemmaDocumentMap.entrySet()) {
+            int docLen = document.getValue().getDocumentLength();
+            int maxFrequency = document.getValue().getMaxTermFrequency();
+
+            if (docLen > maxDocLen) {
+                maxDocLen = docLen;
+                maxDocLenID = document.getKey();
+            }
+
+            if (maxFrequency > maxMaxFrequency) {
+                maxMaxFrequency = maxFrequency;
+                maxMaxFrequencyID = document.getKey();
+            }
+        }
+
+        System.out.println("Max Document Length Details");
+        System.out.println("---------------------------");
+        System.out.println("Max Document Length: " + maxDocLen);
+        System.out.println("Document ID: " + maxDocLenID);
+
+        System.out.println("Max Max-Frequency Details");
+        System.out.println("---------------------------");
+        System.out.println("Max Max-Frequency: " + maxMaxFrequency);
+        System.out.println("Document ID: " + maxMaxFrequencyID);
+
+    }
+
+    private static void printLemmaMaxMinDocFrequencyInformation() {
+        System.out.println("Max and Min Doc Frequency of Index 1");
+        System.out.println("***********************************");
+        int maxDF = Integer.MIN_VALUE;
+        int minDF = Integer.MAX_VALUE;
+        List<String> maxTermsList = new ArrayList<>();
+        List<String> minTermsList = new ArrayList<>();
+
+        for (String term : lemmaDictionary.keySet()) {
+            int df = lemmaDictionary.get(term).size();
+            if (df > maxDF)
+                maxDF = df;
+
+            if (df < minDF)
+                minDF = df;
+        }
+
+        for (String term : lemmaDictionary.keySet()) {
+            int df = lemmaDictionary.get(term).size();
+            if (df == maxDF)
+                maxTermsList.add(term);
+            else if (df == minDF)
+                minTermsList.add(term);
+        }
+
+        System.out.println("Max Document frequency ");
+        System.out.println("-----------------------");
+        System.out.println("Document Frequency: " + maxDF);
+        System.out.println("List of Terms:");
+        System.out.println(maxTermsList);
+
+        System.out.println("Min Document frequency ");
+        System.out.println("-----------------------");
+        System.out.println("Document Frequency: " + minDF);
+        System.out.println("List of Terms:");
+        System.out.println(minTermsList);
+    }
+
+    private static void printStemMaxMinDocFrequencyInformation() {
+        System.out.println("Max and Min Doc Frequency of Index 2");
+        System.out.println("***********************************");
+        int maxDF = Integer.MIN_VALUE;
+        int minDF = Integer.MAX_VALUE;
+        List<String> maxTermsList = new ArrayList<>();
+        List<String> minTermsList = new ArrayList<>();
+
+        for (String term : stemmingDictionary.keySet()) {
+            int df = stemmingDictionary.get(term).size();
+            if (df > maxDF)
+                maxDF = df;
+
+            if (df < minDF)
+                minDF = df;
+        }
+
+        for (String term : stemmingDictionary.keySet()) {
+            int df = stemmingDictionary.get(term).size();
+            if (df == maxDF)
+                maxTermsList.add(term);
+            else if (df == minDF)
+                minTermsList.add(term);
+        }
+
+        System.out.println("Max Document frequency ");
+        System.out.println("-----------------------");
+        System.out.println("Document Frequency: " + maxDF);
+        System.out.println("List of Terms:");
+        System.out.println(maxTermsList);
+
+        System.out.println("Min Document frequency ");
+        System.out.println("-----------------------");
+        System.out.println("Document Frequency: " + minDF);
+        System.out.println("List of Terms:");
+        System.out.println(minTermsList);
+    }
+
+    private static void printNASAInformation() {
         // print details related to Lemma
         List<PostingNode> lemmaPostingNodes = lemmaDictionary.get("nasa");
         System.out.println("Version 1 details");
