@@ -18,7 +18,7 @@ public class Lemmatizer {
         Properties props;
         props = new Properties();
         props.put("annotators", "tokenize,ssplit, pos,  lemma");
-        this.pipeline = new StanfordCoreNLP(props);
+        this.pipeline = new StanfordCoreNLP(props,false);
     }
 
     public List<String> lemmatize(String documentText)

@@ -82,7 +82,7 @@ public class CompressedStemProcessor implements IProcessor {
         }
 
         StringBuilder result = new StringBuilder();
-        result.append(len);
+        result.append(len+1);
         result.append(newTerms[0].substring(0, len));
         result.append("*");
 
@@ -90,13 +90,14 @@ public class CompressedStemProcessor implements IProcessor {
         for (int i = 0; i < newTerms.length; i++) {
             if(newTerms[i].length() > len)
                 result.append(newTerms[i].substring(len));
-            if (i != newTerms.length - 1)
+            if (i != newTerms.length - 1) {
                 result.append(count);
+                result.append('|');
+            }
             count++;
         }
         return result;
     }
-
 
     private void constructCompressedDocumentMap() {
         for (Map.Entry<Integer, DocumentNode> document : ApplicationRunner.getStemmingDocumentMap().entrySet()) {

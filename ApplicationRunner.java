@@ -1,3 +1,5 @@
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import java.io.*;
 import java.util.*;
 
@@ -72,22 +74,52 @@ public class ApplicationRunner {
         if (lstFiles.length == 0)
             System.out.println("Error loading the directory");
         else {
+            System.out.println("Uncompressed Index Version 1 started...");
+            long startTime = System.currentTimeMillis();
             iProcessor = new UncompressedLemmaProcessor(lstFiles);
             iProcessor.execute();
             iProcessor.writeFile();
+            long endTime = System.currentTimeMillis();
+            System.out.println("Uncompressed Index Version 1 completed...");
+            System.out.println("Time taken to complete Uncompressed Version 1 is " + (endTime - startTime) + " ms");
 
+            System.out.println("Uncompressed Index Version 2 started...");
+            startTime = System.currentTimeMillis();
             iProcessor = new UncompressedStemProcessor(lstFiles);
             iProcessor.execute();
             iProcessor.writeFile();
+            endTime = System.currentTimeMillis();
+            System.out.println("Uncompressed Index Version 2 completed...");
+            System.out.println("Time taken to complete Uncompressed Version 2 is " + (endTime - startTime) + " ms");
 
+            System.out.println("Compressed Index Version 1 started...");
+            startTime = System.currentTimeMillis();
             iProcessor = new CompressedLemmaProcessor();
             iProcessor.execute();
             iProcessor.writeFile();
+            endTime = System.currentTimeMillis();
+            System.out.println("Compressed Index Version 1 completed...");
+            System.out.println("Time taken to complete Compressed Version 1 is " + (endTime - startTime) + " ms");
 
+            System.out.println("Compressed Index Version 2 started...");
+            startTime = System.currentTimeMillis();
             iProcessor = new CompressedStemProcessor();
             iProcessor.execute();
             iProcessor.writeFile();
+            endTime = System.currentTimeMillis();
+            System.out.println("Compressed Index Version 2 completed...");
+            System.out.println("Time taken to complete Compressed Version 2 is " + (endTime - startTime) + " ms");
+
+            printInformation();
         }
+    }
+
+    private static void printInformation() {
+        System.out.println("*******File Size Information***********");
+        System.out.println("Index size of Version 1 uncompressed (in bytes):    " + new File(Constants.UNCOMPRESSED_INDEX_VERSION1_FILENAME).length());
+        System.out.println("Index size of Version 1 compressed (in bytes):  " + new File(Constants.COMPRESSED_INDEX_VERSION1_FILENAME).length());
+        System.out.println("Index size of Version 2 uncompressed (in bytes):  " + new File(Constants.UNCOMPRESSED_INDEX_VERSION2_FILENAME).length());
+        System.out.println("Index size of Version 2 compressed (in bytes):  " + new File(Constants.COMPRESSED_INDEX_VERSION2_FILENAME).length());
     }
 
     public static SortedMap<String, LinkedList<PostingNode>> getLemmaDictionary() {
