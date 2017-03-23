@@ -125,9 +125,4 @@ public class CompressedStemProcessor implements IProcessor {
         Utility.serializeObject(Constants.COMPRESSED_INDEX_VERSION2_FILENAME, ApplicationRunner.getStemmingBlockCollection(),
                 ApplicationRunner.getStemmingCompressedDocumentMap());
     }
-
-    @Override
-    public void printDitionary() {
-
-    }
 }

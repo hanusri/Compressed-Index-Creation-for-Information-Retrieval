@@ -71,8 +71,4 @@ public class CompressedLemmaProcessor implements IProcessor {
                 ApplicationRunner.getLemmaCompressedDocumentMap());
     }
 
-    @Override
-    public void printDitionary() {
-
-    }
 }

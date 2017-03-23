@@ -64,9 +64,4 @@ public class UncompressedStemProcessor implements IProcessor {
         Utility.serializeObject(Constants.UNCOMPRESSED_INDEX_VERSION2_FILENAME, ApplicationRunner.getStemmingDictionary(),
                 ApplicationRunner.getStemmingDocumentMap());
     }
-
-    @Override
-    public void printDitionary() {
-
-    }
 }

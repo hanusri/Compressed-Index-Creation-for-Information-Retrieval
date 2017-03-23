@@ -1,5 +1,3 @@
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import java.io.*;
 import java.util.*;
 
@@ -95,7 +93,7 @@ public class ApplicationRunner {
     private static void processFile(String directoryPath) {
         // get the list of files
         File[] lstFiles = Utility.getFiles(directoryPath);
-
+        Arrays.sort(lstFiles);
         if (lstFiles.length == 0)
             System.out.println("Error loading the directory");
         else {
@@ -331,14 +329,14 @@ public class ApplicationRunner {
                     lemmaTerm,
                     lemmaPostingNodes.size(),
                     totalTermFrequency,
-                    Utility.getUncompressedPostingListSize(lemmaPostingNodes, lemmaTerm.length())));
+                    Utility.getUncompressedPostingListSize(lemmaPostingNodes)));
 
             System.out.println(String.format(" %15s \t %-10s  \t %-10d \t %-10d \t %-10d",
                     "Compressed",
                     lemmaTerm,
                     lemmaPostingNodes.size(),
                     totalTermFrequency,
-                    Utility.getCompressedPostingListSize(getLemmaCompressedStatistics().get(lemmaTerm), lemmaTerm.length())));
+                    Utility.getCompressedPostingListSize(getLemmaCompressedStatistics().get(lemmaTerm),lemmaTerm.length())));
         }
     }
 
@@ -359,14 +357,14 @@ public class ApplicationRunner {
                     stemTerm,
                     stemPostingNodes.size(),
                     totalTermFrequency,
-                    Utility.getUncompressedPostingListSize(stemPostingNodes, stemTerm.length())));
+                    Utility.getUncompressedPostingListSize(stemPostingNodes)));
 
             System.out.println(String.format(" %15s %-10s  \t %-10d \t %-10d \t %-10d",
                     "Compressed",
                     stemTerm,
                     stemPostingNodes.size(),
                     totalTermFrequency,
-                    Utility.getCompressedPostingListSize(getStemCompressedStatistics().get(stemTerm), stemTerm.length())));
+                    Utility.getCompressedPostingListSize(getStemCompressedStatistics().get(stemTerm),stemTerm.length())));
         }
     }
 

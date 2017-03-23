@@ -225,10 +225,27 @@ public class Utility {
         return byteOutput.toByteArray();
     }
 
-    public static int getUncompressedPostingListSize(List<PostingNode> postingNodes, int termLength) {
-        int size = 8 + 8 + termLength;
-        size += postingNodes.size() * 8;
-        return size;
+    public static int getUncompressedPostingListSize(List<PostingNode> postingNodes) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = null;
+        try {
+
+            out = new ObjectOutputStream(bos);
+            out.writeObject(postingNodes);
+            out.flush();
+            byte[] byteData = bos.toByteArray();
+            return byteData.length;
+
+        } catch (Exception ex) {
+
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ex) {
+                // ignore close exception
+            }
+        }
+        return 0;
     }
 
     public static int getCompressedPostingListSize(TermStatisticsEntry termStatisticsEntry, int termLength) {
@@ -237,4 +254,6 @@ public class Utility {
         size += termStatisticsEntry.getTermFrequencies().length;
         return size;
     }
+
+
 }

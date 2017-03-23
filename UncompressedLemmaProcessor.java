@@ -68,8 +68,4 @@ public class UncompressedLemmaProcessor implements IProcessor {
                 ApplicationRunner.getLemmaDocumentMap());
     }
 
-    @Override
-    public void printDitionary() {
-
-    }
 }
